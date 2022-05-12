@@ -1,2 +1,2 @@
 # NFTProject
-NFT Project for World Cup Trophy
+NFT Project to create generative art
