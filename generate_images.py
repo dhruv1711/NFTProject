@@ -1,20 +1,55 @@
 from PIL import Image, ImageDraw
 import random
 
+from python_utils import to_int
 
-def generate(px=128, color=(255,255,255)):
-    image = Image.new("RGB", size=(px,px), color=color)
-    
-    
-    draw = ImageDraw.Draw(image)
-    for i in range(20):
-        x1= random.randint(0, px)
-        y1= random.randint(0, px)
-        x2= random.randint(0, px)
-        y2= random.randint(0, px)
-        draw.rectangle([(x1, y1), (x2, y2)], fill=(x1,y1*2-1,y2))
 
-    image.save("test_image.png")
+class ImageGenerator:
+    def __init__(self, width, height, color = None):
+        self.width = width
+        self.height = height
+        if color is None:
+            color = self.random_color()
+        self.image = Image.new('RGB', (self.width, self.height), color)
+
+    def random_color(self):
+        color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+        return color
+
+    def gradient(self, start_color, end_color):
+        base =  Image.new('RGB', (self.width, self.height), start_color)
+        top = Image.new('RGB', (self.width, self.height), end_color)
+        mask = Image.new('L', (self.width, self.height))
+        mask_data = []
+        for y in range(self.height):
+            mask_data.extend([int(255 * (y / self.height))] * self.width)
+        mask.putdata(mask_data)
+        base.paste(top, (0, 0), mask)
+        self.image = base
+        
+    def generate_rect(self, fill_color=None, outline_color=None):
+        if fill_color is None:
+            fill_color = self.random_color()
+        if outline_color is None:
+            outline_color = self.random_color()
+        image = self.image
+        draw = ImageDraw.Draw(image)
+        for _ in range(20):
+            x1= random.randint(0, self.width)
+            y1= random.randint(0, self.height)
+            x2= random.randint(0, self.width)
+            y2= random.randint(0, self.height)
+            draw.rectangle([(x1, y1), (x2, y2)], fill=self.random_color(), width = random.randint(1,5), outline=self.random_color())
+        self.image = image
+
+    def save_image(self, filename):
+        self.image.save(filename)
 
 if __name__ == "__main__":
-    generate(128, (0,0,0))
+    image1 = ImageGenerator(128, 128)
+    image1.generate_rect()
+    image1.save_image("test_image3.png")
+    image2 = ImageGenerator(324, 324)
+    image2.gradient(image2.random_color(), image2.random_color())
+    image2.generate_rect()
+    image2.save_image("gradient_image.png")
