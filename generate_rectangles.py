@@ -1,6 +1,6 @@
-from PIL import Image, ImageDraw
 import random
-
+from PIL import Image, ImageDraw
+import colorsys
 from python_utils import to_int
 
 
@@ -12,7 +12,11 @@ class ImageGenerator:
             color = self.random_color()
         self.image = Image.new('RGB', (self.width, self.height), color)
 
-    def random_color(self):
+    def random_color(self, is_bright = False):
+        if is_bright:
+            float_color = colorsys.hsv_to_rgb(random.random(), 1, 1)
+            color = tuple([int(i*255) for i in float_color])
+            return color
         color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
         return color
 
@@ -22,7 +26,7 @@ class ImageGenerator:
         mask = Image.new('L', (self.width, self.height))
         mask_data = []
         for y in range(self.height):
-            mask_data.extend([int(255 * (y / self.height))] * self.width)
+            mask_data.extend([to_int(255 * (y / self.height))] * self.width)
         mask.putdata(mask_data)
         base.paste(top, (0, 0), mask)
         self.image = base
@@ -35,11 +39,11 @@ class ImageGenerator:
         image = self.image
         draw = ImageDraw.Draw(image)
         for _ in range(20):
-            x1= random.randint(0, self.width)
-            y1= random.randint(0, self.height)
-            x2= random.randint(0, self.width)
-            y2= random.randint(0, self.height)
-            draw.rectangle([(x1, y1), (x2, y2)], fill=self.random_color(), width = random.randint(1,5), outline=self.random_color())
+            x1= random.randint(0, to_int(self.width))
+            y1= random.randint(0, to_int(self.height))
+            x2= random.randint(0, to_int(self.width))
+            y2= random.randint(0, to_int(self.height))
+            draw.rectangle([(x1, y1), (x2, y2)], fill=self.random_color(is_bright=True), width = random.randint(1,5), outline=self.random_color())
         self.image = image
 
     def save_image(self, filename):
