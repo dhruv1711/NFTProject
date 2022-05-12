@@ -1,9 +1,9 @@
 from PIL import Image, ImageDraw
 import random
-random.seed(42)
+
 
 def generate(px=128, color=(255,255,255)):
-    image = Image.new("RGB", size=(px,px), color=(255,255,255))
+    image = Image.new("RGB", size=(px,px), color=color)
     
     
     draw = ImageDraw.Draw(image)
@@ -17,4 +17,4 @@ def generate(px=128, color=(255,255,255)):
     image.save("test_image.png")
 
 if __name__ == "__main__":
-    generate(128, (255,255,255))
+    generate(128, (0,0,0))
